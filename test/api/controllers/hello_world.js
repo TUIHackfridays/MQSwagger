@@ -3,11 +3,19 @@ const request = require('supertest');
 const server = require('../../../app');
 
 describe('controllers', () => {
+  const serverReady = done => {
+    if (server.isReady) done();
+    else {
+      server.once('ready', done);
+    }
+  };
+
+  before(done => serverReady(done));
+
   describe('hello_world', () => {
     describe('GET /hello', () => {
       it('should return a default string', done => {
-        request(server)
-          .get('/hello')
+        request(server).get('/hello')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)

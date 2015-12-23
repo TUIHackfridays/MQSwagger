@@ -4,26 +4,10 @@
   "version": "0.0.1",
   "main": "app.js",
   "scripts": {
-    "lint": "eslint -c .eslintrc ./",
-    "start-prod": "node ./node_modules/better-npm-run start-prod",
-    "start-dev": "node ./node_modules/better-npm-run start-dev",
-    "test": "mocha ./test"
-  },
-  "betterScripts": {
-    "start-prod": {
-      "command": "node ./app.js",
-      "env": {
-        "NODE_ENV": "production",
-        "NODE_CONFIG_DIR": "./config"
-      }
-    },
-    "start-dev": {
-      "command": "node ./app.js",
-      "env": {
-        "NODE_ENV": "development",
-        "NODE_CONFIG_DIR": "./config"
-      }
-    }
+    "lint": "eslint -c .eslintrc ./; exit 0",
+    "production": "NODE_ENV=production node ./app.js",
+    "start": "node ./app.js",
+    "test": "mocha ./test; exit 0"
   },
   "author": "Edgar Ribeiro",
   "email": "edgar@cloudoki.com",
@@ -32,13 +16,13 @@
     "npm": ">=3.4"
   },
   "dependencies": {
-    "better-npm-run": "0.0.4",
+    "amqplib": "^0.4.0",
+    "bluebird": "^3.1.1",
     "config": "^1.17.1",
     "express": "^4.13.3",
     "lodash": "^3.10.1",
-    "morgan": "^1.6.1",
-    "winston": "^2.1.1",
-    "swagger-express-mw": "^0.1.0"
+    "swagger-express-mw": "^0.1.0",
+    "winston": "^2.1.1"
   },
   "devDependencies": {
     "chai": "^3.4.1",

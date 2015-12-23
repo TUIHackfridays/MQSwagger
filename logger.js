@@ -1,9 +1,10 @@
-// A multi-transport async lconfigogging library
+// A multi-transport async logging library
 const winston = require('winston');
 
 // Utilities for handling and transforming file paths
 const path = require('path');
 
+const Promise = require('bluebird');
 /**
  * Initiliazation of logger
  *
@@ -23,35 +24,60 @@ const path = require('path');
  *
  * @return {winston.Logger}
  */
-module.exports = config => new winston.Logger({
-  // configuration of logger transports
-  transports: Object.keys(config.transports).map(transport => {
-    // get options for this specific transport
-    const cfg = config.transports[transport];
+module.exports = config => {
+  'use strict';
 
-    // remove transport if not defined options or set to false
-    if (!cfg.options) {
-      return undefined;
-    }
+  const logger = new winston.Logger({
+    // configuration of logger transports
+    transports: Object.keys(config.transports).map(transport => {
+      // get options for this specific transport
+      const cfg = config.transports[transport];
 
-    // if require is needed expose winston.transports[required transport]
-    if (cfg.require) {
-      require(cfg.require);
-    }
+      // remove transport if not defined options or set to false
+      if (!cfg.options) {
+        return undefined;
+      }
 
-    // set name equal to transport
-    cfg.options.name = cfg.options.name ? cfg.options.name : transport;
+      // if require is needed expose winston.transports[required transport]
+      if (cfg.require) {
+        require(cfg.require);
+      }
 
-    // join absolute path to filename option to relative log path
-    if (cfg.options.filename) {
-      cfg.options.filename = path.resolve(__dirname, config.path + '/' +
-        cfg.options.filename);
-    }
+      // set name equal to transport
+      cfg.options.name = cfg.options.name ? cfg.options.name : transport;
 
-    // initialize and return transport
-    return new winston.transports[transport](cfg.options);
-  }).filter(transport => !!transport),
+      // join absolute path to filename option to relative log path
+      if (cfg.options.filename) {
+        cfg.options.filename = path.resolve(__dirname, config.path + '/' +
+          cfg.options.filename);
+      }
 
-  levels: config.levels,
-  colors: config.colors
-});
+      // initialize and return transport
+      return new winston.transports[transport](cfg.options);
+    }).filter(transport => !!transport),
+
+    levels: config.levels,
+    colors: config.colors
+  });
+
+  Object.keys(logger.levels).forEach(level => {
+    const transportsCount = Object.keys(logger.transports).length;
+    const vanilla = logger[level];
+    logger[level] = function promiseLog() {
+      const args = arguments;
+      return new Promise(resolve => {
+        let transports = transportsCount;
+        const onLogging = () => {
+          transports--;
+          if (transports <= 0) {
+            logger.removeListener('logging', onLogging);
+            resolve();
+          }
+        };
+        logger.on('logging', onLogging);
+        vanilla.apply(logger, args);
+      });
+    };
+  });
+  return logger;
+};

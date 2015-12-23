@@ -4,10 +4,11 @@ swagger:
 
   fittingsDirs: [ api/fittings ]
   defaultPipe: null
-  swaggerControllerPipe: swagger_controllers  # defines the standard processing pipe for controllers
+  swaggerControllerPipe: swagger_controllers  # defines the standard processing
+                                              # pipe for controllers
 
-  # values defined in the bagpipes key are the bagpipes pipes and fittings definitions
-  # (see https://github.com/apigee-127/bagpipes)
+  # values defined in the bagpipes key are the bagpipes pipes and fittings
+  # definitions (see https://github.com/apigee-127/bagpipes)
   bagpipes:
     _router:
       name: swagger_router
@@ -35,13 +36,16 @@ swagger:
 server:
   port: 10010
 
+amqp:
+  url: amqp://localhost
+
 logger:
-  path: "./log"
+  path: ./log
   transports:
     File:
       options:
-        filename: "default.log"
-        level: "info"
+        filename: default.log
+        level: info
         json: false
         maxsize: 5242880
         maxFiles: 100
@@ -51,7 +55,7 @@ logger:
         tailable: true
     Console:
       options:
-        level: "info"
+        level: info
         json: false
         timestamp: true
         prettyPrint: true
@@ -62,14 +66,14 @@ logger:
 #   NOTE: Add token and subdomain to your local configuration file
 #
 #   Loggly:
-#     require: "winston-loggly"
+#     require: winston-loggly
 #     options:
-#       level: "info"
-#       subdomain: "The subdomain of your Loggly account [required]"
-#       inputToken: "The input token [required]"
+#       level: info
+#       subdomain: The subdomain of your Loggly account [required]
+#       inputToken: The input token [required]
 #       tags:
-#         - "your tags here"
-#         - "another tag"
+#         - your tags here
+#         - another tag
 #       json: true
 #       stripColors: true
 
@@ -80,8 +84,8 @@ logger:
     warn: 1
     error: 0
   colors:
-    verbose: "white"
-    debug: "blue"
-    info: "green"
-    warn: "yellow"
-    error: "red"
+    verbose: white
+    debug: blue
+    info: green
+    warn: yellow
+    error: red
