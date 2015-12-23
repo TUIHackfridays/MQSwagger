@@ -8,7 +8,7 @@
     "start-prod": "node ./node_modules/better-npm-run start-prod",
     "start-dev": "node ./node_modules/better-npm-run start-dev",
     "test": "mocha ./test",
-    "gen-doc": "rm -rf docs/visualtalk-api && jsdoc ./docs/README.md package.json -c conf.json"
+    "gen-doc": "jsdoc -c conf.json -R README.md"
   },
   "betterScripts": {
     "start-prod": {

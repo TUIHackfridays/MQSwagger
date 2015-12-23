@@ -1,7 +1,7 @@
 {
     "tags": {
         "allowUnknownTags": true,
-        "dictionaries": ["jsdoc", "closure"]
+        "dictionaries"    : ["jsdoc", "closure"]
     },
     "source": {
         "include":
@@ -14,19 +14,21 @@
             "docs/",
             "test/"
         ],
-        "includePattern": ".+\\.js(doc)?$",
-        "excludePattern": "(^|\\/|\\\\)_"
+        "includePattern"  : ".+\\.js(doc)?$",
+        "excludePattern"  : "(^|\\/|\\\\)_"
     },
     "plugins": [],
     "templates": {
-        "cleverLinks": false,
-        "monospaceLinks": false
+        "cleverLinks"     : false,
+        "monospaceLinks"  : false
     },
     "opts": {
-        // "template": "templates/default", // same as -t templates/default
-        "encoding": "utf8", // same as -e utf8
-        "destination": "./docs/", // same as -d ./out/
-        "recurse": true // same as -r
-        // "tutorials": "path/to/tutorials", // same as -u path/to/tutorials
+        "encoding"        : "utf8",
+        "destination"     : "./docs/",
+        "recurse"         : true
+    },
+    "markdown"  : {
+        "parser"          : "gfm",
+        "hardwrap"        : true
     }
 }
