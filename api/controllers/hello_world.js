@@ -18,11 +18,13 @@ const util = require('util');
   module that 'hello' maps to the function named 'hello'
  */
 module.exports = {
-  /*
-  Functions in a127 controllers used for operations should take two parameters:
-
-  Param 1: a handle to the request object
-  Param 2: a handle to the response object
+  /**
+  * Hello controller function.<br />
+  * Functions in a127 controllers used for operations should take two parameters:
+  *
+  * @alias hello
+  * @param {Object} req - A handle to the request object
+  * @param {Object} res - A handle to the response object
  */
   hello: (req, res) => {
     // variables defined in the Swagger document can be referenced using

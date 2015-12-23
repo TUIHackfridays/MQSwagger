@@ -7,7 +7,9 @@ const path = require('path');
 /**
  * Initiliazation of logger
  *
- * @param {Object} config logger
+ * @alias initLogger
+ * @param {Object} config_logger
+ * <pre>
  *  {
  *    path: {String},               log path to folder
  *    transports: {
@@ -21,6 +23,7 @@ const path = require('path');
  *    colors: {Object}
  *  }
  *
+ * </pre>
  * @return {winston.Logger}
  */
 module.exports = config => new winston.Logger({

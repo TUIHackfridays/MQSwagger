@@ -7,7 +7,8 @@
     "lint": "eslint -c .eslintrc ./",
     "start-prod": "node ./node_modules/better-npm-run start-prod",
     "start-dev": "node ./node_modules/better-npm-run start-dev",
-    "test": "mocha ./test"
+    "test": "mocha ./test",
+    "gen-doc": "rm -rf docs/visualtalk-api && jsdoc ./docs/README.md package.json -c conf.json"
   },
   "betterScripts": {
     "start-prod": {
@@ -38,7 +39,8 @@
     "lodash": "^3.10.1",
     "morgan": "^1.6.1",
     "winston": "^2.1.1",
-    "swagger-express-mw": "^0.1.0"
+    "swagger-express-mw": "^0.1.0",
+    "jsdoc": "^3.4.0"
   },
   "devDependencies": {
     "chai": "^3.4.1",

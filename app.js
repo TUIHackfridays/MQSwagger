@@ -1,19 +1,27 @@
 #!/usr/bin/env node
-
-// swagger-node-runner mutates config.swagger after require
+/**
+* Set ALLOW_CONFIG_MUTATIONS to true
+* swagger-node-runner mutates config.swagger after require
+*/
 process.env.ALLOW_CONFIG_MUTATIONS = true;
 const config = require('config');
-
 const logger = require('./logger')(config.get('logger'));
 const SwaggerExpress = require('swagger-express-mw');
 const morgan = require('morgan');
 const app = require('express')();
-// for testing
+// export app for testing
 module.exports = app;
 
 SwaggerExpress.create({
   appRoot: __dirname, // required config
-}, (error, swaggerExpress) => {
+},
+/**
+* Function to connect swagger to the middleware.
+* @alias connect_middleware
+* @param {String} error - String to be logged in case of error
+* @param {Object} connector - The middleware connector
+*/
+(error, swaggerExpress) => {
   'use strict';
   if (error) {
     logger.error(error);
@@ -32,9 +40,9 @@ SwaggerExpress.create({
     // install middleware
     swaggerExpress.register(app);
 
-    // Output enviroment and logger transports levels
-    logger.info('Enviroment: ' + config.util.getEnv('NODE_ENV') +
-      ', logger transports: ', Object.keys(logger.transports).map(transport =>
+    // Output environment and logger transports levels
+    logger.info('Environment: ' + config.util.getEnv('NODE_ENV') + ', logger transports: ',
+      Object.keys(logger.transports).map(transport =>
         transport + '@' + logger.transports[transport].level));
 
     // Start listening to requests
