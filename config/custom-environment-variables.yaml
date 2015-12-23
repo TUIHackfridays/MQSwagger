@@ -1,0 +1,5 @@
+server:
+  port: PORT
+
+# Custom environment variables override all configuration files,
+# including local.json. Only command line options take precedence over them.

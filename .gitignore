@@ -1,0 +1,18 @@
+npm-debug.log*
+
+# Dependency directory
+node_modules
+
+# Covers JetBrains IDEs
+*.iml
+
+## Directory-based project format:
+.idea/
+
+# Runtime configuration for swagger app
+config/runtime.yaml
+
+# Runtime data
+pids
+*.pid
+*.seed
