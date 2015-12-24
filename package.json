@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint -c .eslintrc ./; exit 0",
     "production": "NODE_ENV=production node ./app.js",
+    "development": "NODE_ENV=development node ./app.js",
     "start": "node ./app.js",
     "test": "mocha ./test; exit 0",
     "docs": "jsdoc -c conf.json -R README.md"
