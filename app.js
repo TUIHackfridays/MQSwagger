@@ -44,7 +44,7 @@ amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
     // if amqp was initialized close the connection before throw
     if (amqp.conn) amqp.conn.close();
     // make sure error is logged properly and then throw it
-    return logger.error(error).tap(() => {
+    return logger.error(error).then(() => {
       throw error;
     });
   });

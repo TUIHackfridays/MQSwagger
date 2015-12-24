@@ -1,4 +1,4 @@
-const should = require('should');
+const should = require('chai').should();
 const request = require('supertest');
 process.env.ALLOW_CONFIG_MUTATIONS = true;
 const config = require('config');
