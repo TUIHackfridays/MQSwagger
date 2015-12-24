@@ -1,21 +1,49 @@
 const should = require('should');
 const request = require('supertest');
-const server = require('../../../app');
+process.env.ALLOW_CONFIG_MUTATIONS = true;
+const config = require('config');
+
+const amqp = require('../../../lib/amqp')(config.get('amqp'));
+const api = require('../../../lib/api')(config.get('api'));
+
+// initialize amqp and connect to the MQ server
+amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
+  // attach connection to amqp and register amqp to the api
+  .then((conn) => {
+    amqp.closeConnOnSIGINT(conn);
+    amqp.conn = conn;
+    amqp.register(api);
+    // initialize api
+    return api.init();
+  })
+  // start listining to requests
+  .then(() => api.start())
+  .then(() => {
+    api.emit('ready');
+    api.isReady = true;
+  })
+  // handle any error on the promise chain (breaks it)
+  .catch(error => {
+    // if amqp was initialized close the connection before throw
+    if (amqp.conn) amqp.conn.close();
+    // make sure error is logged properly and then throw it
+    throw error;
+  });
 
 describe('controllers', () => {
-  const serverReady = done => {
-    if (server.isReady) done();
+  const apiReady = done => {
+    if (api.isReady) done();
     else {
-      server.once('ready', done);
+      api.once('ready', done);
     }
   };
 
-  before(done => serverReady(done));
+  before(done => apiReady(done));
 
   describe('hello_world', () => {
     describe('GET /hello', () => {
       it('should return a default string', done => {
-        request(server).get('/hello')
+        request(api).get('/hello')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
@@ -29,7 +57,7 @@ describe('controllers', () => {
       });
 
       it('should accept a name parameter', done => {
-        request(server)
+        request(api)
           .get('/hello')
           .query({
             name: 'Scott'

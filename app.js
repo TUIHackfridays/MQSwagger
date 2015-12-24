@@ -7,12 +7,10 @@
 process.env.ALLOW_CONFIG_MUTATIONS = true;
 
 const config = require('config');
-const logger = require('./logger')(config.get('logger'));
-const SwaggerExpress = require('swagger-express-mw');
-// const Promise = require('bluebird');
-const app = require('express')();
-// for testing
-module.exports = app;
+
+const logger = require('./lib/logger')(config.get('logger'));
+const amqp = require('./lib/amqp')(config.get('amqp'));
+const api = require('./lib/api')(config.get('api'));
 
 // Output environment and logger transports levels
 logger.info('app start', {
@@ -23,50 +21,30 @@ logger.info('app start', {
   }))
 });
 
-require('./amqp')(config.get('amqp'), (e, amqp) => {
-  'use strict';
-  if (e) {
-    logger.error(e).then(() => {
-      throw e;
-    });
-    return;
-  }
-
-  // install middleware
-  amqp.register(app);
-
-  process.once('SIGINT', () => {
-    amqp.conn.close();
-    logger.info('SIGINT').then(() => process.exit());
-  });
-
-  SwaggerExpress.create({
-    appRoot: __dirname, // required config
-  }, (error, swaggerExpress) => {
-    if (error) {
-      amqp.conn.close();
-      logger.error(error).then(() => {
-        throw error;
-      });
-      return;
-    }
-    // install middleware
-    swaggerExpress.register(app);
-
-    // Start listening to requests
-    const server = app.listen(config.get('server.port'), err => {
-      if (err) {
-        amqp.conn.close();
-        logger.error(err).then(() => {
-          throw err;
-        });
-        return;
-      }
-      app.emit('ready');
-      app.isReady = true;
-      logger.info('server listen', {
-        port: server.address().port
-      });
+// initialize amqp and connect to the MQ server
+amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
+  .tap(() => logger.info('amqp connect', {
+    url: config.get('amqp.url')
+  }))
+  // attach connection to amqp and register amqp to the api
+  .then((conn) => {
+    amqp.closeConnOnSIGINT(conn);
+    amqp.conn = conn;
+    amqp.register(api);
+    // initialize api
+    return api.init();
+  })
+  // start listining to requests
+  .then(() => api.start())
+  .tap(() => logger.info('api listen', {
+    port: config.get('api').port
+  }))
+  // handle any error on the promise chain (breaks it)
+  .catch(error => {
+    // if amqp was initialized close the connection before throw
+    if (amqp.conn) amqp.conn.close();
+    // make sure error is logged properly and then throw it
+    return logger.error(error).tap(() => {
+      throw error;
     });
   });
-});

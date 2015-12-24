@@ -33,7 +33,7 @@ swagger:
     swagger_raw:
       name: swagger_raw
 
-server:
+api:
   port: 10010
 
 amqp:
