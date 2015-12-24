@@ -36,6 +36,8 @@ module.exports = config => {
       // get options for this specific transport
       const cfg = config.transports[transport];
 
+      const type = cfg.type || transport;
+
       // remove transport if not defined options or set to false
       if (!cfg.options) {
         return undefined;
@@ -51,12 +53,12 @@ module.exports = config => {
 
       // join absolute path to filename option to relative log path
       if (cfg.options.filename) {
-        cfg.options.filename = path.resolve(__dirname, config.path + '/' +
-          cfg.options.filename);
+        cfg.options.filename = path.resolve(__dirname, (
+          config.path || './log') + '/' + cfg.options.filename);
       }
 
       // initialize and return transport
-      return new winston.transports[transport](cfg.options);
+      return new winston.transports[type](cfg.options);
     }).filter(transport => !!transport),
 
     levels: config.levels,
@@ -64,21 +66,27 @@ module.exports = config => {
   });
 
   Object.keys(logger.levels).forEach(level => {
-    const transportsCount = Object.keys(logger.transports).length;
     const vanilla = logger[level];
     logger[level] = function promiseLog() {
       const args = arguments;
       return new Promise(resolve => {
-        let transports = transportsCount;
-        const onLogging = () => {
-          transports--;
-          if (transports <= 0) {
-            logger.removeListener('logging', onLogging);
-            resolve();
-          }
-        };
-        logger.on('logging', onLogging);
+        const levelValue = logger.levels[level];
+        let transports = Object.keys(logger.transports).filter(key =>
+          logger.levels[logger.transports[key].level] >= levelValue).length;
+        if (transports) {
+          const onLogging = () => {
+            transports--;
+            if (transports <= 0) {
+              logger.removeListener('logging', onLogging);
+              resolve();
+            }
+          };
+          logger.on('logging', onLogging);
+        }
         vanilla.apply(logger, args);
+        if (!transports) {
+          resolve();
+        }
       });
     };
   });
