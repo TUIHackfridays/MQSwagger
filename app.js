@@ -1,14 +1,27 @@
 #!/usr/bin/env node
 
-// swagger-node-runner mutates config.swagger after require
+/**
+ * Set ALLOW_CONFIG_MUTATIONS to true
+ * swagger-node-runner mutates config.swagger after require
+ */
 process.env.ALLOW_CONFIG_MUTATIONS = true;
+
+const config = require('config');
+const logger = require('./logger')(config.get('logger'));
 const SwaggerExpress = require('swagger-express-mw');
 // const Promise = require('bluebird');
 const app = require('express')();
-const config = require('config');
-const logger = require('./logger')(config.get('logger'));
 // for testing
 module.exports = app;
+
+// Output environment and logger transports levels
+logger.info('app start', {
+  env: config.util.getEnv('NODE_ENV'),
+  loggerTransports: Object.keys(logger.transports).map(transport => ({
+    name: transport,
+    level: logger.transports[transport].level
+  }))
+});
 
 require('./amqp')(config.get('amqp'), (e, amqp) => {
   'use strict';
@@ -40,11 +53,6 @@ require('./amqp')(config.get('amqp'), (e, amqp) => {
     // install middleware
     swaggerExpress.register(app);
 
-    // Output enviroment and logger transports levels
-    logger.info('Enviroment: ' + config.util.getEnv('NODE_ENV') +
-      ', logger transports: ', Object.keys(logger.transports).map(transport =>
-        transport + '@' + logger.transports[transport].level));
-
     // Start listening to requests
     const server = app.listen(config.get('server.port'), err => {
       if (err) {
@@ -56,12 +64,9 @@ require('./amqp')(config.get('amqp'), (e, amqp) => {
       }
       app.emit('ready');
       app.isReady = true;
-      logger.info('Listening on port %d', server.address().port);
-
-      if (swaggerExpress.runner.swagger.paths['/hello']) {
-        logger.info('try this:\ncurl http://127.0.0.1:' +
-          server.address().port + '/hello?name=Scott');
-      }
+      logger.info('server listen', {
+        port: server.address().port
+      });
     });
   });
 });

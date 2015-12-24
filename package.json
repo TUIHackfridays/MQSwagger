@@ -1,13 +1,14 @@
 {
   "name": "mqswagger",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.2",
   "main": "app.js",
   "scripts": {
     "lint": "eslint -c .eslintrc ./; exit 0",
     "production": "NODE_ENV=production node ./app.js",
     "start": "node ./app.js",
-    "test": "mocha ./test; exit 0"
+    "test": "mocha ./test; exit 0",
+    "docs": "jsdoc -c conf.json -R README.md"
   },
   "author": "Edgar Ribeiro",
   "email": "edgar@cloudoki.com",
@@ -30,6 +31,7 @@
     "eslint-config-airbnb": "^1.0.0",
     "mocha": "^2.3.4",
     "should": "^7.1.0",
-    "supertest": "^1.0.0"
+    "supertest": "^1.0.0",
+    "jsdoc": "^3.4.0"
   }
 }

@@ -8,7 +8,9 @@ const Promise = require('bluebird');
 /**
  * Initiliazation of logger
  *
- * @param {Object} config logger
+ * @alias initLogger
+ * @param {Object} config
+ * <pre>
  *  {
  *    path: {String},               log path to folder
  *    transports: {
@@ -21,8 +23,9 @@ const Promise = require('bluebird');
  *    levels: {Object},
  *    colors: {Object}
  *  }
+ * </pre>
  *
- * @return {winston.Logger}
+ * @return {winston.Logger} logger - Winston Logger with promisified logging
  */
 module.exports = config => {
   'use strict';
@@ -35,7 +38,7 @@ module.exports = config => {
 
       // remove transport if not defined options or set to false
       if (!cfg.options) {
-        return undefined;
+        return;
       }
 
       // if require is needed expose winston.transports[required transport]
