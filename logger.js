@@ -6,7 +6,7 @@ const path = require('path');
 
 const Promise = require('bluebird');
 /**
- * Initiliazation of logger
+ * Initialization of logger
  *
  * @alias initLogger
  * @param {Object} config
@@ -38,7 +38,7 @@ module.exports = config => {
 
       // remove transport if not defined options or set to false
       if (!cfg.options) {
-        return;
+        return undefined;
       }
 
       // if require is needed expose winston.transports[required transport]
