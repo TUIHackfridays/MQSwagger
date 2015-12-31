@@ -32,7 +32,7 @@ describe('logger', () => {
     it('should be called once', done => {
       const spy = sinon.spy();
       logger.on('logging', spy);
-      logger.debug('debug test').then(() => {
+      logger.promise.debug('debug test').then(() => {
         spy.should.have.callCount(1);
         setTimeout(() => {
           spy.should.have.callCount(1);
@@ -44,7 +44,7 @@ describe('logger', () => {
     it('should be called twice', done => {
       const spy = sinon.spy();
       logger.on('logging', spy);
-      logger.verbose('verbose test').then(() => {
+      logger.promise.verbose('verbose test').then(() => {
         spy.should.have.callCount(2);
         setTimeout(() => {
           spy.should.have.callCount(2);

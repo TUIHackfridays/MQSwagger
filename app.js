@@ -12,6 +12,8 @@ const logger = require('./lib/logger')(config.get('logger'));
 const amqp = require('./lib/amqp')(config.get('amqp'));
 const api = require('./lib/api')(config.get('api'));
 
+const Promise = require('bluebird');
+
 // Output environment and logger transports levels
 logger.info('app start', {
   env: config.util.getEnv('NODE_ENV'),
@@ -22,7 +24,8 @@ logger.info('app start', {
 });
 
 // initialize amqp and connect to the MQ server
-amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
+Promise.resolve(amqp.connect(
+    config.get('amqp.url'), config.get('amqp').socketOptions))
   .tap(() => logger.info('amqp connect', {
     url: config.get('amqp.url')
   }))
@@ -44,7 +47,7 @@ amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
     // if amqp was initialized close the connection before throw
     if (amqp.conn) amqp.conn.close();
     // make sure error is logged properly and then throw it
-    return logger.error(error).then(() => {
+    return logger.promise.error(error).then(() => {
       throw error;
     });
   });
