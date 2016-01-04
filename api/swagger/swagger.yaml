@@ -18,6 +18,29 @@ consumes:
 produces:
   - application/json
 paths:
+  /hello/amqp:
+    x-swagger-router-controller: hello_amqp
+    get:
+      description: Returns 'Hello' to the caller after sending it to amqp queue
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - name: name
+          in: query
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /hello:
     # binds a127 app logic to a route
     x-swagger-router-controller: hello_world
