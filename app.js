@@ -25,12 +25,12 @@ logger.info('app start', {
 
 // initialize amqp and connect to the MQ server
 Promise.resolve(amqp.connect(
-    config.get('amqp.url'), config.get('amqp').socketOptions))
+  config.get('amqp.url'), config.get('amqp').socketOptions))
   .tap(() => logger.info('amqp connect', {
     url: config.get('amqp.url')
   }))
   // attach connection to amqp and register amqp to the api
-  .then((conn) => {
+  .then(conn => {
     amqp.closeConnOnSIGINT(conn);
     amqp.conn = conn;
     amqp.register(api);

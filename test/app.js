@@ -14,8 +14,6 @@ amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
     // initialize api
     return api.init();
   })
-  // start listining to requests
-  .then(() => api.start())
   .then(() => {
     api.emit('ready');
     api.isReady = true;
