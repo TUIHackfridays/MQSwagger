@@ -1,19 +1,22 @@
+'use strict';
+
 process.env.ALLOW_CONFIG_MUTATIONS = true;
 const config = require('config');
 
-const amqp = require('../lib/amqp')(config.get('amqp'));
+const amqp = require('../lib/amqp');
 const api = require('../lib/api')(config.get('api'));
+const helloQueue = require('../api/controllers/helloQueue');
+
+let connection;
 
 // initialize amqp and connect to the MQ server
-amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
-  // attach connection to amqp and register amqp to the api
-  .then((conn) => {
-    amqp.closeConnOnSIGINT(conn);
-    amqp.conn = conn;
-    amqp.register(api);
-    // initialize api
-    return api.init();
+amqp.createConnection(config.get('amqp'))
+  .then(conn => {
+    connection = conn;
+    return helloQueue.init(conn, config.get('controllers.helloQueue'));
   })
+  .then(() => api.swagger())
+  .then(() => api.start())
   .then(() => {
     api.emit('ready');
     api.isReady = true;
@@ -21,12 +24,8 @@ amqp.connect(config.get('amqp.url'), config.get('amqp').socketOptions)
   // handle any error on the promise chain (breaks it)
   .catch(error => {
     // if amqp was initialized close the connection before throw
-    if (amqp.conn) amqp.conn.close();
-    // make sure error is logged properly and then throw it
+    if (connection) connection.close();
     throw error;
   });
 
-module.exports = {
-  api: api,
-  amqp: amqp
-};
+module.exports = api;

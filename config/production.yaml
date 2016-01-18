@@ -2,6 +2,6 @@ logger:
   transports:
     File:
       options:
-        filename: "production.log"
-        level: "info"
+        filename: production.log
+        level: info
     Console: false

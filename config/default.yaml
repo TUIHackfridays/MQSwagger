@@ -2,7 +2,7 @@
 # values in the swagger hash are system configuration for swagger-node
 swagger:
 
-  fittingsDirs: [ api/fittings ]
+  fittingsDirs: [ api/fittings, node_modules ]
   defaultPipe: null
   swaggerControllerPipe: swagger_controllers  # defines the standard processing
                                               # pipe for controllers
@@ -38,6 +38,10 @@ api:
 
 amqp:
   url: amqp://localhost
+
+controllers:
+  helloQueue:
+    name: 'hello_queue'
 
 logger:
   path: ./log

@@ -1,7 +1,7 @@
 const should = require('chai').should();
 const request = require('supertest');
 
-const api = require('../../app').api;
+const api = require('../../app');
 
 describe('controllers', () => {
   const apiReady = done => {

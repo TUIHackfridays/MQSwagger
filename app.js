@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 
 /**
  * Set ALLOW_CONFIG_MUTATIONS to true
@@ -9,10 +10,10 @@ process.env.ALLOW_CONFIG_MUTATIONS = true;
 const config = require('config');
 
 const logger = require('./lib/logger')(config.get('logger'));
-const amqp = require('./lib/amqp')(config.get('amqp'));
+const amqp = require('./lib/amqp');
 const api = require('./lib/api')(config.get('api'));
-
-const Promise = require('bluebird');
+logger.info(api);
+const helloQueue = require('./api/controllers/helloQueue');
 
 // Output environment and logger transports levels
 logger.info('app start', {
@@ -23,31 +24,31 @@ logger.info('app start', {
   }))
 });
 
+let connection;
+
 // initialize amqp and connect to the MQ server
-Promise.resolve(amqp.connect(
-  config.get('amqp.url'), config.get('amqp').socketOptions))
-  .tap(() => logger.info('amqp connect', {
-    url: config.get('amqp.url')
-  }))
-  // attach connection to amqp and register amqp to the api
+amqp.createConnection(config.get('amqp')).tap(() =>
+    logger.info('amqp.createConnection', {
+      url: config.get('amqp.url')
+    }))
   .then(conn => {
-    amqp.closeConnOnSIGINT(conn);
-    amqp.conn = conn;
-    amqp.register(api);
-    // initialize api
-    return api.init();
+    connection = conn;
+    return helloQueue.init(conn, config.get('controllers.helloQueue'));
   })
-  // start listining to requests
+  .then(() => api.swagger())
+  .then(swagger => logger.info('api.swagger', swagger))
   .then(() => api.start())
-  .tap(() => logger.info('api listen', {
-    port: config.get('api').port
+  .then(server => logger.info('api.start', {
+    port: server.address().port
   }))
   // handle any error on the promise chain (breaks it)
   .catch(error => {
     // if amqp was initialized close the connection before throw
-    if (amqp.conn) amqp.conn.close();
+    if (connection) connection.close();
     // make sure error is logged properly and then throw it
     return logger.promise.error(error).then(() => {
       throw error;
     });
   });
+
+module.exports = api;

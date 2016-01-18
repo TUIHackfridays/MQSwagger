@@ -1,7 +1,7 @@
 const should = require('chai').should();
 const request = require('supertest');
 
-const api = require('../../app').api;
+const api = require('../../app');
 
 describe('controllers', () => {
   const apiReady = done => {
@@ -13,7 +13,7 @@ describe('controllers', () => {
 
   before(done => apiReady(done));
 
-  describe('hello_amqp', () => {
+  describe('helloQueue', () => {
     describe('GET /hello/amqp', () => {
       it('should return a default string', done => {
         request(api).get('/hello/amqp')

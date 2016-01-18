@@ -2,8 +2,8 @@ logger:
   transports:
     File:
       options:
-        filename: "development.log"
-        level: "verbose"
+        filename: development.log
+        level: verbose
     Console:
       options:
-        level: "debug"
+        level: debug
