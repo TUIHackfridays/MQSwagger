@@ -1,4 +1,66 @@
 'use strict';
+
+const util = require('util');
+const amqp = require('../../lib/amqp');
+
+const connConfig = {
+  url: 'amqp://localhost'
+};
+
+const mainConn = amqp.createConnection(connConfig);
+
+/*
+const configHello = {
+  name: 'hello_queue'
+};
+
+const simpleQueue = {
+  init: (conn, config) => {
+    return amqp.createChannel(conn)
+    .then(ch => amqp.createSimpleQueue(ch, config.name || 'hello_queue'));
+  },
+  hello: (queue) => {
+    const name = 'Stranger';
+    const msg = util.format('Hello, %s!', name);
+
+    if (!queue) {
+      Error('controller not initialized');
+    }
+    queue.then(q => q.send(msg))
+      .then(() => console.log('[x] Sent:', msg))
+      .catch(err => console.error(err));
+  }
+};
+
+const queue = mainConn.then(conn => simpleQueue.init(conn, configHello));
+rpcQueue.hello(queue);
+*/
+
+const configRpc = {
+  name: 'rpc_queue'
+};
+
+const rpcQueue = {
+  init: (conn, config) => {
+    return amqp.createChannel(conn)
+      .then(ch => amqp.createReqResQueue(ch, config.name || 'rpc_queue'));
+  },
+  rpc: (rpc) => {
+    const name = 'Stranger';
+    const msg = util.format('Hello, %s!', name);
+
+    if (!rpc) {
+      Error('controller not initialized');
+    }
+    rpc.then(q => q.request(msg))
+      .then(() => console.log('[x] Sent:', msg))
+      .catch(err => console.error(err));
+  }
+};
+
+const rpc = mainConn.then(conn => rpcQueue.init(conn, configRpc));
+rpcQueue.rpc(rpc);
+
 /*
 const util = require('util');
 const Promise = require('bluebird');
