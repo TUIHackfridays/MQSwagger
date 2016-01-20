@@ -53,7 +53,10 @@ const rpcQueue = {
       Error('controller not initialized');
     }
     rpc.then(q => q.request(msg))
-      .then(() => console.log('[x] Sent:', msg))
+      .then(resp => {
+        console.log('[x] Sent:', msg);
+        console.log('[x] Received:', resp.content.toString('utf8'));
+      })
       .catch(err => console.error(err));
   }
 };
